@@ -8,7 +8,7 @@ INFINITY = 50000
 maxnodes = 1
 
 def board_state(state):
-	i=0
+	i = 0
 #	temp = zeros([3,3])
 	temp = [([0] * 3) for j in range(3)]
 	for row in range(3):
@@ -162,33 +162,33 @@ def dfs( start, goal):
 			    if state not in explored:
 			        nodes.insert(0, item)
  
-def dls( start, goal, depth=20):
-	"""Performs the depth limit search. """  
-	depth_limit = depth
+# def dls( start, goal, depth=20):
+	# """Performs the depth limit search. """  
+	# depth_limit = depth
 	# A list (can act as a stack too) for the nodes.
-	nodes = []
+	# nodes = []
 	# Create the queue with the root node in it.
-	nodes.append( create_node( start, None, None, 0, 0 ) )
-	count=0
-	explored = []
-	while nodes:
+	# nodes.append( create_node( start, None, None, 0, 0 ) )
+	# count = 0
+	# explored = []
+	# while nodes:
 		# take the node from the front of the queue
-		node = nodes.pop(0)
-		count+=1
-		explored.append(node.getState())
-		print ("Trying state", node.state, " and move: ", node.operator)
+		# node = nodes.pop(0)
+		# count+=1
+		# explored.append(node.getState())
+		# print ("Trying state", node.state, " and move: ", node.operator)
 		# if this node is the goal, return the moves it took to get here.
-		if node.state == goal:
-			print ("Done")
-			print ("The number of nodes visited", count)
-			print ("States of moves are as follows: ")
-			return node.pathFromStart()
-		if node.depth < depth_limit:
-			expanded_nodes = expand_node(node)
-			for item in expanded_nodes:
-			    state = item.getState()
-			    if state not in explored:
-			        nodes.insert(0, item)
+		# if node.state == goal:
+		#	print ("Done")
+		#	print ("The number of nodes visited", count)
+		#	print ("States of moves are as follows: ")
+		#	return node.pathFromStart()
+		# if node.depth < depth_limit:
+		#	expanded_nodes = expand_node(node)
+		#	for item in expanded_nodes:
+		#	    state = item.getState()
+		#	    if state not in explored:
+		#	        nodes.insert(0, item)
 
 def ids( start, goal, depth=50 ):
 	"""Perfoms an iterative depth first search."""
@@ -198,33 +198,33 @@ def ids( start, goal, depth=50 ):
 			return result
 
 
-def greedy(start,goal):
-	"""Perform the greedy best first search."""
-	nodes=[]
-	nodes.append(create_node( start, None, None, 0, 0 ))
-	explored = []
-	count=0
-	while nodes:
+# def greedy(start,goal):
+	# """Perform the greedy best first search."""
+	# nodes = []
+	# nodes.append(create_node( start, None, None, 0, 0 ))
+	# explored = []
+	# count = 0
+	# while nodes:
 		# Sort the nodes with h(n):the estimated cost to the goal.
-		nodes.sort( cmp1 )
+	#	nodes.sort( cmp1 )
 		# take the node from the front of the queue
-		node = nodes.pop(0)
-		explored.append(node.getState())
-		count+=1
+	#	node = nodes.pop(0)
+	#	explored.append(node.getState())
+	#	count+=1
 		# if this node is the goal, return the moves it took to get here.
-		print ("Trying state", node.state, " and move: ", node.operator)
-		if node.state == goal:
-			print ("Done")
-			print ("The number of nodes visited", count)
-			print ("States of moves are as follows: ")
-			return node.pathFromStart()
-		else:
+	#	print ("Trying state", node.state, " and move: ", node.operator)
+	#	if node.state == goal:
+	#		print ("Done")
+	#		print ("The number of nodes visited", count)
+	#		print ("States of moves are as follows: ")
+	#		return node.pathFromStart()
+	#	else:
 		    # Expand the node and add all the expansions to the end of the queue
-			expanded_nodes = expand_node( node )
-			for item in expanded_nodes:
-			    state = item.getState()
-			    if state not in explored:
-			       nodes.append(item)
+	#		expanded_nodes = expand_node( node )
+	#		for item in expanded_nodes:
+	#		    state = item.getState()
+	#		    if state not in explored:
+	#		       nodes.append(item)
 		
 def a_star( start, goal ):
 	"""Perfoms the A* heuristic search"""
@@ -286,7 +286,7 @@ def dfs_contour(node,goal,f_limit):
 
 def ida_star(start, goal):
 	"""Perfoms the IDA* heuristic search"""
-	nodes=[]
+	nodes = []
 	nodes.append( create_node( start, None, None, 0, 0 ) )
 	# take the node from the front of the queue
 	node = nodes.pop(0)
@@ -312,19 +312,19 @@ def cmp( x, y ):
 	# f2,using h2(sum of manhattan distance)
 	return f2(x) - f2(y)
 
-def cmp1(x, y):
-	"""Compare function for Greedy. f(n) = h(n). """
+# def cmp1(x, y):
+	# """Compare function for Greedy. f(n) = h(n). """
 	# h1(number of tiles out of place) 
 	#res = h1( x.state, goal_state ) - h1( y.state, goal_state )
 	
 	# h2(sum of manhattan distance)
-	res = h2(x.state) - h2(y.state) 
-	if res > 0:
-		return 1
-	elif res == 0:
-		return 0
-	else:
-		return -1
+	# res = h2(x.state) - h2(y.state) 
+	# if res > 0:
+	#	return 1
+	# elif res == 0:
+	#	return 0
+	# else:
+	#	return -1
 
 def h1( state, goal ):
 	"""Heuristic. Returns an integer based on out of place tiles"""
@@ -405,13 +405,13 @@ class Node:
 	 
 # Main method
 def main():
-    #start_state=[1,3,4,8,6,2,7,0,5] [2,8,1,0,4,3,7,6,5] [5,6,7,4,0,8,3,2,1]
-	start_state =[5,6,7,4,0,8,3,2,1]
+    #start_state = [1,3,4,8,6,2,7,0,5] [2,8,1,0,4,3,7,6,5] [5,6,7,4,0,8,3,2,1]
+	start_state = [5,6,7,4,0,8,3,2,1]
 	### CHANGE THIS FUNCTION TO USE bfs, dfs, dls, ids, greedy, a_star or ida_star
 	start = time.clock() 
 	result = ida_star( start_state, goal_state )
 	end = time.clock() 
-	totaltime= end-start
+	totaltime = end-start
 	if result == None:	
 		print ("No solution found")
 	elif result == [None]: 
@@ -421,7 +421,7 @@ def main():
 		print (len(result), " moves")
 	print ("Total searching time: %.5f seconds" % (totaltime))
 
-# A python-isim. Basically if the file is being run execute the main() function.
+# A python-ism. Basically if the file is being run execute the main() function.
 if __name__ == "__main__":
 	main()
     
