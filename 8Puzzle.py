@@ -2,7 +2,9 @@ import time
 
 from Queue import PriorityQueue
 
-goal_state = [1, 2, 3, 8, 0, 4, 7, 6, 5]
+# goal_state = [1, 2, 3, 8, 0, 4, 7, 6, 5]
+
+goal_state = [1, 2, 3, 4, 5, 6, 7, 8, 0]
 
 INFINITY = 50000
 maxnodes = 1
