@@ -2,11 +2,11 @@
 
 In this assignment you will explore State-Space Search with the 8-Puzzle and 15-Puzzle.  You will need to implement and provide code for the following algorithms:
 
-Breadth-First Search
-Depth-First Search
-Iterative-Deepening Depth-First Search
-A* w/ Out-Of-Place, and Manhattan Distance Heuristics
-Iterative Deepening A* w/ Out-Of-Place, and Manhattan Distance Heuristics
+Breadth-First Search, 
+Depth-First Search, 
+Iterative-Deepening Depth-First Search, 
+A* w/ Out-Of-Place, and Manhattan Distance Heuristics, 
+Iterative Deepening A* w/ Out-Of-Place, and Manhattan Distance Heuristics, 
 
 Develop search code with requirements:
 
@@ -22,39 +22,40 @@ Provide link to Github repository with all code, and submit final report as PDF 
 
 Provide overview of your code.
 Provide results for the following problems:
-"160273485" 
-"462301587" 
-"821574360" 
-"840156372" 
-"530478126" 
-"068314257" 
-"453207186" 
-"128307645" 
-"035684712" 
-"684317025" 
-"028514637" 
-"618273540" 
-"042385671" 
-"420385716" 
-"054672813" 
-"314572680" 
-"637218045" 
-"430621875" 
-"158274036" 
+
+"160273485", 
+"462301587", 
+"821574360", 
+"840156372", 
+"530478126", 
+"068314257", 
+"453207186", 
+"128307645", 
+"035684712", 
+"684317025", 
+"028514637", 
+"618273540", 
+"042385671", 
+"420385716", 
+"054672813", 
+"314572680", 
+"637218045", 
+"430621875", 
+"158274036", 
 "130458726"
 
 
 EASY:
-"16235A749C08DEBF" 
-"0634217859ABDEFC" 
-"012456379BC8DAEF" 
-"51246A38097BDEFC" 
+"16235A749C08DEBF", 
+"0634217859ABDEFC", 
+"012456379BC8DAEF", 
+"51246A38097BDEFC", 
 "12345678D9CFEBA0"
 
 DIFFICULT:
-"71A92CE03DB4658F" 
-"02348697DF5A1EBC" 
-"39A1D0EC7BF86452" 
-"EAB480FC19D56237" 
+"71A92CE03DB4658F", 
+"02348697DF5A1EBC", 
+"39A1D0EC7BF86452", 
+"EAB480FC19D56237", 
 "7DB13C52F46E80A9"
 
