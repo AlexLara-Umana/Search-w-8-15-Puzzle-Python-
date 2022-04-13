@@ -9,14 +9,14 @@
          2- informed search methods, that include:
              i- Greedy best-first
              ii- A*
-    - The program should start by asking the user to enter the size of the puzzle, which should follow the recommendation:
+- The program should start by asking the user to enter the size of the puzzle, which should follow the recommendation:
         1- For depth first (no more than 1 or 2 moves for any puzzle > 2)
         2- Uninformed search method (no bigger than 3x3 puzzle)
         3- And finally no puzzle bigger than 5 or 6
         The reader have to note that the prior recommendations are set because of the time to solve the problem,
          for example a problem of size 6 will have search space of 1.856x10^41, what ever size of the problem have little
         to no chance of breaking the code but it'll have a lot of time.
-    - The program when it's being under use, it's divided into three main methods/functions:
+- The program when it's being under use, it's divided into three main methods/functions:
         1- def random_state(n), which take the size of the problem and return a random state that
            is granted to be solvable.
         2- def solvable(state), which take a two dimensional array that represent the state and return true if the state
@@ -108,7 +108,7 @@ cost functions."""
 
 class Node:
     """constructor of the Node class."""
-    def __init__(self, state, g, parent = None, action = None, children = None):
+    def __init__(self, state, g, parent=None, action=None, children=None):
         self.state = state
         self.parent = parent
         self.action = action
@@ -222,18 +222,28 @@ class GoalTree:
         elif strategy.lower() == 'depth first':
             start = datetime.now()
             sol_state, sol, g, processed_nodes, max_stored_nodes, flag = self.depth_first()
+        elif strategy.lower() == 'uniform cost':
+            start = datetime.now()
+            sol_state, sol, g, processed_nodes, max_stored_nodes, flag = self.uniform_cost()
+        elif strategy.lower() == 'depth limited':
+            limit = int(input('Enter a limit -> '))
+            start = datetime.now()
+            sol_state, sol, g, processed_nodes, max_stored_nodes, flag = self.depth_limited(limit)
         elif strategy.lower() == 'iterative deepening':
             start = datetime.now()
             sol_state, sol, g, processed_nodes, max_stored_nodes, flag = self.iterative_deepening()
         elif strategy.lower() == 'a*' or strategy.lower() == 'a star':
             start = datetime.now()
             sol_state, sol, g, processed_nodes, max_stored_nodes, flag = self.a_star()
+        elif strategy.lower() == 'greedy' or 'best first':
+            start = datetime.now()
+            sol_state, sol, g, processed_nodes, max_stored_nodes, flag = self.greedy()
 
         return sol_state, sol, g, processed_nodes, max_stored_nodes, flag, start
 
     """"-------------------------------------------------------------------------------------------"""
     """ Search methods:
-            uninformed search methods: (breadth-first, depth-first, iterative deepening) """
+            uninformed search methods: (breadth-first, depth-first, uniformed cost, depth limited, iterative deepening) """
 
     # find the shallowest solution.
     def breadth_first(self):
@@ -321,6 +331,89 @@ class GoalTree:
                     processed_nodes += 1
                     frontier.append(child)
 
+    def uniform_cost(self):
+        node = Node(self.root.state, 0)
+        self.root = node
+        processed_nodes = 1
+        max_stored_nodes = 1
+        dim = len(node.state) * len(node.state)
+
+        # case 1: if the initial state is the goal state
+        if self.is_goal(node.state):
+            sol = self.solution(node)
+            return node.state, sol, node.g, processed_nodes, max_stored_nodes, True
+
+        # case 2: searching for the goal state
+        frontier = []
+        heappush(frontier, (node, node.g))
+        explored = set()
+        while True:
+            # Failed outcome, (i.e. didn't find the goal state)
+            if len(frontier) == 0:
+                sol = self.solution(self.root)
+                # will return the root state instead of node state to indicate that we don't find the solution
+                return self.root.state, sol, node.g, processed_nodes, max_stored_nodes, False
+
+            stored = len(frontier)
+            if stored > max_stored_nodes:
+                max_stored_nodes = stored
+
+            # checking for the goal state
+            node = heappop(frontier)[0]
+            if self.is_goal(node.state):
+                sol = self.solution(node)
+                return node.state, sol, node.g, processed_nodes, max_stored_nodes, True
+
+            # recording visited states.
+            temp = tuple(np.reshape(node.state, dim))
+            explored.add(temp)
+            children = node.expand()
+            # add unexplored states to frontier
+            for child in children:
+                child1 = tuple(np.reshape(child.state, dim))
+                if child1 not in explored:
+                    processed_nodes += 1
+                    heappush(frontier, (child, child.g))
+
+    # without explored set
+    def depth_limited(self, limit):
+        node = Node(self.root.state, 0)
+        self.root = node
+        processed_nodes = 1
+        max_stored_nodes = 1
+
+        # case 1: if the initial state is the goal state
+        if self.is_goal(node.state):
+            sol = self.solution(node)
+            return node.state, sol, node.g, processed_nodes, max_stored_nodes, True
+
+        # case 2: searching for the goal state
+        frontier = [node]
+        # explored = set()
+        while True:
+            # Failed outcome, (i.e. didn't find the goal state)
+            if len(frontier) == 0:
+                sol = self.solution(self.root)
+                # will return the root state instead of node state to indicate that we don't find the solution
+                return self.root.state, sol, node.g, processed_nodes, max_stored_nodes, False
+
+            stored = len(frontier)
+            if stored > max_stored_nodes:
+                max_stored_nodes = stored
+
+            # checking for the goal state
+            node = frontier.pop()
+            if self.is_goal(node.state):
+                sol = self.solution(node)
+                return node.state, sol, node.g, processed_nodes, max_stored_nodes, True
+
+            # recording visited states.
+            if limit >= node.g + 1:
+                children = node.expand()
+                for child in children:
+                    processed_nodes += 1
+                    frontier.append(child)
+
     def iterative_deepening(self):
         level = 0
         flag = False
@@ -335,7 +428,49 @@ class GoalTree:
         return sol_state, sol, g, total_processed_nodes, final_max_stored_nodes, flag
 
     """-------------------------------------------------------------------------------------------"""
-    """Informed search methods: (A*) """
+    """Informed search methods: (greedy search(best-first search), A*) """
+    def greedy(self):
+        node = Node(self.root.state, 0)
+        self.root = node
+        max_stored_nodes = 1
+        processed_nodes = 1
+        dim = len(node.state) * len(node.state)
+
+        # case 1: if the initial state is the goal state
+        if self.is_goal(node.state):
+            sol = self.solution(node)
+            return node.state, sol, node.g, processed_nodes, max_stored_nodes, True
+
+        # case 2: searching for the goal state
+        frontier = []
+        heappush(frontier, (node, node.manhattan_distance()))
+        explored = set()
+        while True:
+            # Failed outcome, (i.e. didn't find the goal state)
+            if len(frontier) == 0:
+                sol = self.solution(node)
+                # will return the root state instead of node state to indicate that we don't find the solution
+                return self.root.state, sol, node.g, processed_nodes, max_stored_nodes, False
+
+            stored = len(frontier)
+            if stored > max_stored_nodes:
+                max_stored_nodes = stored
+            # checking for the goal state
+            node = heappop(frontier)[0]
+            if self.is_goal(node.state):
+                sol = self.solution(node)
+                return node.state, sol, node.g, processed_nodes, max_stored_nodes, True
+
+            # recording visited states.
+            temp = tuple(np.reshape(node.state, dim))
+            explored.add(temp)
+            children = node.expand()
+            # add unexplored states to frontier
+            for child in children:
+                child1 = tuple(np.reshape(child.state, dim))
+                if child1 not in explored:
+                    processed_nodes += 1
+                    heappush(frontier, (child, child.manhattan_distance()))
 
     def a_star(self):
         node = Node(self.root.state, 0)
@@ -470,8 +605,8 @@ initial = [[1, 2, 3, 4],
 
 
 """ Choosing an algorithm """
-algorithm = input("Choose an algorithm [Breadth first, Depth first, Iterative deepening, \
-A*] -> ")
+algorithm = input("Choose an algorithm [Breadth first, Depth first, Uniform cost, Depth limited, Iterative deepening, \
+Greedy, A*] -> ")
 
 gt = GoalTree(initial)
 info = gt.solve(algorithm)
