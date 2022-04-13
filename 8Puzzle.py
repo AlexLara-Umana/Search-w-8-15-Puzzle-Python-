@@ -28,6 +28,29 @@ def display_board( state ):
 	print ("-------------")
 	print ("| %i | %i | %i |" % (state[6], state[7], state[8]))
 	print ("-------------")
+	
+# def board_state(state):
+#	i = 0
+##	temp = zeros([3,3])
+#	temp = [([0] * 4) for j in range(4)]
+#	for row in range(4):
+#         for col in range(4):
+#            temp[row][col] = state[i]
+#            i+=1
+#	return temp
+	
+    
+#def display_board( state ):
+#	print ("-------------")
+#	print ("| %i | %i | %i | %i |" % (state[0], state[1], state[2], state[3]))
+#	print ("-------------")
+#	print ("| %i | %i | %i | %i |" % (state[4], state[5], state[6], state[7]))
+#	print ("-------------")
+#	print ("| %i | %i | %i | %i |" % (state[8], state[9], state[10], state[11]))
+#	print ("-------------")
+#	print ("| %i | %i | %i | %i |" % (state[12], state[13], state[14], state[15]))
+#	print ("-------------")
+
 
 	
 def move_up( state ):
