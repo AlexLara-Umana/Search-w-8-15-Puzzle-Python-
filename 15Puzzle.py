@@ -322,44 +322,6 @@ def dfs():
 		exit()
 	print (pState.depth,created,expanded,s.max)
 
-################################################################
-#  _   _ _____  _____  
-# | | | /  __ \/  ___| 
-# | | | | /  \/\ `--.  
-# | | | ||      `--. \ 
-# | |_| | \__/\/\__/ / 
-#  \___/\_____/\____/ 
-#
-#	Kind of pointless cause
-#	Cost will always be 1..
-#	But the method is there I
-#	guess if I ever need it.
-
-def ucs():
-	succeeded = 0
-	expanded = 0
-	created = 0
-	pState = PuzState(STATE)
-	maxF = 0
-	VISITED.append(pState.state)
-	pq = [(0, pState)]
-	while len(pq) > 0:
-		pState2 = heappop(pq)[1]
-		expanded += 1
-		if len(pq) > maxF:
-			maxF = len(pq)
-		if (pState2.state == SOLVED_STATE or\
-			pState2.state == SOLVED_STATE_B):
-			succeeded = 1
-			break
-		possibleStates = findMoves(pState2)
-		created += len(possibleStates)
-		for eachState in possibleStates:
-			heappush(pq, (eachState.depth, eachState));
-	if (succeeded == 0):
-		print -1,-1,-1,-1
-		exit()
-	print (pState2.depth,created,expanded,maxF)
 
 ################################################################
 #   ___     _    
