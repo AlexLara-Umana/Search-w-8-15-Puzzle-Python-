@@ -108,7 +108,7 @@ cost functions."""
 
 class Node:
     """constructor of the Node class."""
-    def __init__(self, state, g, parent=None, action=None, children=None):
+    def __init__(self, state, g, parent = None, action = None, children = None):
         self.state = state
         self.parent = parent
         self.action = action
@@ -222,28 +222,18 @@ class GoalTree:
         elif strategy.lower() == 'depth first':
             start = datetime.now()
             sol_state, sol, g, processed_nodes, max_stored_nodes, flag = self.depth_first()
-        elif strategy.lower() == 'uniform cost':
-            start = datetime.now()
-            sol_state, sol, g, processed_nodes, max_stored_nodes, flag = self.uniform_cost()
-        elif strategy.lower() == 'depth limited':
-            limit = int(input('Enter a limit -> '))
-            start = datetime.now()
-            sol_state, sol, g, processed_nodes, max_stored_nodes, flag = self.depth_limited(limit)
         elif strategy.lower() == 'iterative deepening':
             start = datetime.now()
             sol_state, sol, g, processed_nodes, max_stored_nodes, flag = self.iterative_deepening()
         elif strategy.lower() == 'a*' or strategy.lower() == 'a star':
             start = datetime.now()
             sol_state, sol, g, processed_nodes, max_stored_nodes, flag = self.a_star()
-        elif strategy.lower() == 'greedy' or 'best first':
-            start = datetime.now()
-            sol_state, sol, g, processed_nodes, max_stored_nodes, flag = self.greedy()
 
         return sol_state, sol, g, processed_nodes, max_stored_nodes, flag, start
 
     """"-------------------------------------------------------------------------------------------"""
     """ Search methods:
-            uninformed search methods: (breadth-first, depth-first, uniformed cost, depth limited, iterative deepening) """
+            uninformed search methods: (breadth-first, depth-first, iterative deepening) """
 
     # find the shallowest solution.
     def breadth_first(self):
@@ -345,7 +335,7 @@ class GoalTree:
         return sol_state, sol, g, total_processed_nodes, final_max_stored_nodes, flag
 
     """-------------------------------------------------------------------------------------------"""
-    """Informed search methods: (greedy search(best-first search), A*) """
+    """Informed search methods: (A*) """
 
     def a_star(self):
         node = Node(self.root.state, 0)
