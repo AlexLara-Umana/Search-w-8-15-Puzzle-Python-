@@ -1,125 +1,404 @@
-''' Structural Game for 15 - Puzzle with different difficulty levels'''
-from random import randint
- 
- 
-class Puzzle:
-    def __init__(self):
-        self.items = {}
-        self.position = None
- 
-    def main_frame(self):
-        d = self.items
-        print('+-----+-----+-----+-----+')
-        print('|%s|%s|%s|%s|' % (d[1], d[2], d[3], d[4]))
-        print('+-----+-----+-----+-----+')
-        print('|%s|%s|%s|%s|' % (d[5], d[6], d[7], d[8]))
-        print('+-----+-----+-----+-----+')
-        print('|%s|%s|%s|%s|' % (d[9], d[10], d[11], d[12]))
-        print('+-----+-----+-----+-----+')
-        print('|%s|%s|%s|%s|' % (d[13], d[14], d[15], d[16]))
-        print('+-----+-----+-----+-----+')
- 
-    def format(self, ch):
-        ch = ch.strip()
-        if len(ch) == 1:
-            return '  ' + ch + '  '
-        elif len(ch) == 2:
-            return '  ' + ch + ' '
-        elif len(ch) == 0:
-            return '     '
- 
-    def change(self, to):
-        fro = self.position
-        for a, b in self.items.items():
-            if b == self.format(str(to)):
-                to = a
-                break
-        self.items[fro], self.items[to] = self.items[to], self.items[fro]
-        self.position = to
- 
-    def build_board(self, difficulty):
-        for i in range(1, 17):
-            self.items[i] = self.format(str(i))
-        tmp = 0
-        for a, b in self.items.items():
-            if b == '  16 ':
-                self.items[a] = '     '
-                tmp = a
-                break
-        self.position = tmp
-        if difficulty == 0:
-            diff = 10
-        elif difficulty == 1:
-            diff = 50
-        else:
-            diff = 100
-        for _ in range(diff):
-            lst = self.valid_moves()
-            lst1 = []
-            for j in lst:
-                lst1.append(int(j.strip()))
-            self.change(lst1[randint(0, len(lst1)-1)])
- 
-    def valid_moves(self):
-        pos = self.position
-        if pos in [6, 7, 10, 11]:
-            return self.items[pos - 4], self.items[pos - 1],\
-                   self.items[pos + 1], self.items[pos + 4]
-        elif pos in [5, 9]:
-            return self.items[pos - 4], self.items[pos + 4],\
-                   self.items[pos + 1]
-        elif pos in [8, 12]:
-            return self.items[pos - 4], self.items[pos + 4],\
-                   self.items[pos - 1]
-        elif pos in [2, 3]:
-            return self.items[pos - 1], self.items[pos + 1], self.items[pos + 4]
-        elif pos in [14, 15]:
-            return self.items[pos - 1], self.items[pos + 1],\
-                  self.items[pos - 4]
-        elif pos == 1:
-            return self.items[pos + 1], self.items[pos + 4]
-        elif pos == 4:
-            return self.items[pos - 1], self.items[pos + 4]
-        elif pos == 13:
-            return self.items[pos + 1], self.items[pos - 4]
-        elif pos == 16:
-            return self.items[pos - 1], self.items[pos - 4]
- 
-    def game_over(self):
-        flag = False
-        for a, b in self.items.items():
-            if b == '     ':
-                pass
-            else:
-                if a == int(b.strip()):
-                    flag = True
-                else:
-                    flag = False
-        return flag
- 
- 
-g = Puzzle()
-g.build_board(int(input('Enter the difficulty : 0 1 2\n2 '
-                        '=> highest 0=> lowest\n')))
-g.main_frame()
-print('Enter 0 to exit')
-while True:
-    print('Hello user:\nTo change the position just enter the no. near it')
-    lst = g.valid_moves()
-    lst1 = []
-    for i in lst:
-        lst1.append(int(i.strip()))
-        print(i.strip(), '\t', end='')
-    print()
-    x = int(input())
-    if x == 0:
-        break
-    elif x not in lst1:
-        print('Wrong move')
-    else:
-        g.change(x)
-    g.main_frame()
-    if g.game_over():
-        print('You WON')
-        break
- 
+import sys
+from heapq import heappush, heappop
+
+#################################################################
+################## 		GLOBAL VARIABLES 	#####################
+#################################################################
+SOLVED_STATE_15		= '123456789ABCDEF '
+SOLVED_STATE_15B	= '123456789ABCDFE '
+SOLVED_STATE_8		= '12345678 '
+SOLVED_STATE_3		= '123 '
+STATE_15 			= '1645AC9F8 273BED'
+STATE_8 			= '4732 6158'
+STATE_3 			= '21 3'
+ARGUMENTS			= sys.argv
+STATE  				= ARGUMENTS[1]
+VISITED				= []
+DIMENSION			= int(len(STATE) ** 0.5)
+
+if len(STATE) == 9:
+	SOLVED_STATE 	= SOLVED_STATE_8
+	SOLVED_STATE_B  = SOLVED_STATE_8
+elif len(STATE) == 16:
+	SOLVED_STATE 	= SOLVED_STATE_15
+	SOLVED_STATE_B  = SOLVED_STATE_15B
+elif len(STATE) == 4:
+	SOLVED_STATE 	= SOLVED_STATE_3
+	SOLVED_STATE_B 	= SOLVED_STATE_3
+else:
+	print ('\nERROR ENCOUNTERED\n')
+	print ('The puzzle state you put in of invalid length.')
+	exit()
+
+METHOD				= ARGUMENTS[2]
+HEURISTIC  			= None
+
+if len(ARGUMENTS) == 4:
+	HEURISTIC 		= ARGUMENTS[3]
+
+################################################################
+
+################################################################
+################## 		PUZSTATE CLASS 		####################
+################################################################
+class PuzState:
+	def __init__(self, theState):
+		self.state = theState
+		self.parent = None
+		self.depth = 0
+		self.hval = 0
+
+###############################################################
+
+###############################################################
+################# 		QUEUE CLASS 	#######################
+###############################################################
+class Queue:
+	def __init__(self):
+		self.items = []
+		self.max = 0
+		self.current = 0
+
+	def isEmpty(self):
+		return self.items == []
+
+	def enqueue(self, item):
+		self.current += 1
+		if self.current > self.max:
+			self.max = self.current
+		self.items.append(item)
+
+	def dequeue(self):
+		self.current -= 1
+		return self.items.pop(0)
+
+	def size(self):
+		return len(self.items)
+
+#############################################################
+
+#############################################################
+##################		STACK CLASS 	#####################
+#############################################################
+class Stack:
+	def __init__(self):
+		self.items = []
+		self.max = 0
+		self.current = 0
+
+	def isEmpty(self):
+		return self.items == []
+
+	def push(self, item):
+		self.current += 1
+		if self.current > self.max:
+			self.max = self.current
+		self.items.append(item)
+
+	def pop(self):
+		self.current -= 1
+		return self.items.pop()
+
+	def size(self):
+		return len(self.items)
+
+############################################################
+
+############################################################
+############## 		METHODS FOR PUZZLE STATE	############
+############################################################
+
+# Prints the puzzle string in a 2d square format
+def printPuzzle(stateOfPuz):
+	for x in range(0,DIMENSION):
+		print(stateOfPuz.state[DIMENSION*x:DIMENSION*(x+1)])
+	print('\n')
+
+# Will swap the space in the puzzle string
+# with an adjacent char
+def swap(stateOfPuz, i, j):
+	li = list(stateOfPuz.state)
+	li[i], li[j] = li[j], li[i]
+	state = PuzState(''.join(li))
+	state.depth = stateOfPuz.depth + 1
+	state.parent = stateOfPuz
+	return state
+	
+# This checks if space can be swaped with char above
+def moveUp(stateOfPuz):
+	space = stateOfPuz.state.index(' ')
+	if (space - DIMENSION >= 0):
+		return swap(stateOfPuz, space, space - DIMENSION)
+
+# This checks if space can be swaped with char below
+def moveDown(stateOfPuz):
+	space = stateOfPuz.state.index(' ')
+	if (space + DIMENSION <= ((DIMENSION*DIMENSION) -1)):
+		return swap(stateOfPuz, space, space + DIMENSION)
+
+# This checks if space can be swaped with char to the left
+def moveLeft(stateOfPuz):
+	space = stateOfPuz.state.index(' ')
+	if((space // DIMENSION) == ((space - 1) // DIMENSION)):
+		return swap(stateOfPuz, space, space - 1)
+
+# This checks if space can be swaped with char to the right
+def moveRight(stateOfPuz):
+	space = stateOfPuz.state.index(' ')
+	if((space // DIMENSION) == ((space + 1) // DIMENSION)):
+		return swap(stateOfPuz, space, space + 1)
+
+
+# This calculates the heuristic for greedy and aStar method
+def calcHeuristic(stateOfPuz):
+	if HEURISTIC == 'h1':
+		count = 9
+		listOfPassed = list(stateOfPuz.state)
+		listOfActual = list(SOLVED_STATE)
+		for i in range(0, len(listOfPassed)):
+			if listOfPassed[i] == listOfActual[i]:
+				count -= 1;
+		return count
+	elif HEURISTIC == 'h2':
+		count = 0
+		listOfPassed = list(stateOfPuz.state)
+		listOfActual = list(SOLVED_STATE)
+		for i in range(0, len(listOfPassed)):
+			ch = listOfPassed[i]
+			index = SOLVED_STATE.index(ch)
+			count += abs((i // DIMENSION)-(index // DIMENSION))
+			count += abs((i % DIMENSION)-(index % DIMENSION))
+		return count
+	else:
+		print ('\nERROR ENCOUNTERED\n')
+		print ('The heuristic provided is not valid')
+		print ('Please try one of the following: ')
+		print ("\t\t\th1\t'Counts the number of tiles",\
+			  "in incorrect places.'")
+		print ("\t\t\th2\t'Counts the manhattan distance of each tile")
+		print ("\t\t\t\t to it's correct placement and returns the sum.'")
+		exit()
+
+# This will look at all possible moves of a current
+# state and return a list of PuzState objects that
+# can spawn from it
+def findMoves(stateOfPuz):
+	li = []
+	if METHOD == 'DLS':
+		if stateOfPuz.depth < int(HEURISTIC):
+			upState = moveUp(stateOfPuz)
+			downState = moveDown(stateOfPuz)
+			rightState = moveRight(stateOfPuz)
+			leftState = moveLeft(stateOfPuz)
+			if rightState is not None and \
+			rightState.state not in VISITED:
+				li.append(rightState)
+				VISITED.append(rightState.state)
+			if downState is not None and \
+			downState.state not in VISITED:
+				li.append(downState)
+				VISITED.append(downState.state)
+			if leftState is not None and \
+			leftState.state not in VISITED:
+				li.append(leftState)
+				VISITED.append(leftState.state)
+			if upState is not None and \
+			upState.state not in VISITED:
+				li.append(upState)
+				VISITED.append(upState.state)
+	else:
+		upState = moveUp(stateOfPuz)
+		downState = moveDown(stateOfPuz)
+		rightState = moveRight(stateOfPuz)
+		leftState = moveLeft(stateOfPuz)
+		if HEURISTIC is not None:
+			if upState is not None:
+				upState.hval = calcHeuristic(upState)
+			if downState is not None:
+				downState.hval = calcHeuristic(downState)
+			if rightState is not None:
+				rightState.hval = calcHeuristic(rightState)
+			if leftState is not None:
+				leftState.hval = calcHeuristic(leftState)
+		if rightState is not None and \
+		rightState.state not in VISITED:
+			li.append(rightState)
+			VISITED.append(rightState.state)
+		if downState is not None and \
+		downState.state not in VISITED:
+			li.append(downState)
+			VISITED.append(downState.state)
+		if leftState is not None and \
+		leftState.state not in VISITED:
+			li.append(leftState)
+			VISITED.append(leftState.state)
+		if upState is not None and \
+		upState.state not in VISITED:
+			li.append(upState)
+			VISITED.append(upState.state)
+	return li
+
+#################################################################
+
+#################################################################
+################ 		SEARCH ALGORITHMS 		#################
+#################################################################		
+# ____________ _____ 
+# | ___ \  ___/  ___|
+# | |_/ / |_  \ `--. 
+# | ___ \  _|  `--. \
+# | |_/ / |   /\__/ /
+# \____/\_|   \____/ 
+#
+#	This search utilizes
+#	a queue. Queue class
+#	defined above.
+
+def bfs():
+	succeeded = 0
+	expanded = 0
+	created = 0
+	pState = PuzState(STATE)
+	q = Queue()
+	q.enqueue(pState)
+	while q.size() > 0:
+		pState = q.dequeue()
+		expanded += 1
+		VISITED.append(pState.state)
+		if (pState.state == SOLVED_STATE or\
+			pState.state == SOLVED_STATE_B):
+			succeeded += 1
+			break
+		possibleStates = findMoves(pState)
+		created += len(possibleStates)
+		for eachState in possibleStates:
+			q.enqueue(eachState)
+	if (succeeded == 0):
+		print -1,-1,-1,-1
+		exit()
+	print (pState.depth,created,expanded,q.max)
+
+
+	# lis = []
+	# while not pState is None:
+	# 	lis.append(pState)
+	# 	pState = pState.parent
+	# for path in reversed(lis):
+	# 	printPuzzle(path)
+
+################################################################
+# ____________ _____ 
+# |  _  \  ___/  ___|
+# | | | | |_  \ `--. 
+# | | | |  _|  `--. \
+# | |/ /| |   /\__/ /
+# |___/ \_|   \____/ 
+#
+#	This search utilizes
+#	a stack. Stack class
+#	defined above.
+                   
+def dfs():
+	succeeded = 0
+	expanded = 0
+	created = 0
+	pState = PuzState(STATE)
+	s = Stack()
+	s.push(pState)
+	while s.size() > 0:
+		pState = s.pop()
+		expanded += 1
+		VISITED.append(pState.state)
+		if (pState.state == SOLVED_STATE or\
+			pState.state == SOLVED_STATE_B):
+			succeeded = 1
+			break
+		possible = findMoves(pState)
+		created += len(possible)
+		for states in possible:
+			s.push(states)
+	if (succeeded == 0):
+		print -1,-1,-1,-1
+		exit()
+	print (pState.depth,created,expanded,s.max)
+
+################################################################
+#  _   _ _____  _____  
+# | | | /  __ \/  ___| 
+# | | | | /  \/\ `--.  
+# | | | ||      `--. \ 
+# | |_| | \__/\/\__/ / 
+#  \___/\_____/\____/ 
+#
+#	Kind of pointless cause
+#	Cost will always be 1..
+#	But the method is there I
+#	guess if I ever need it.
+
+def ucs():
+	succeeded = 0
+	expanded = 0
+	created = 0
+	pState = PuzState(STATE)
+	maxF = 0
+	VISITED.append(pState.state)
+	pq = [(0, pState)]
+	while len(pq) > 0:
+		pState2 = heappop(pq)[1]
+		expanded += 1
+		if len(pq) > maxF:
+			maxF = len(pq)
+		if (pState2.state == SOLVED_STATE or\
+			pState2.state == SOLVED_STATE_B):
+			succeeded = 1
+			break
+		possibleStates = findMoves(pState2)
+		created += len(possibleStates)
+		for eachState in possibleStates:
+			heappush(pq, (eachState.depth, eachState));
+	if (succeeded == 0):
+		print -1,-1,-1,-1
+		exit()
+	print (pState2.depth,created,expanded,maxF)
+
+################################################################
+#   ___     _    
+#  / _ \ /\| |/\ 
+# / /_\ \\ \ / / 
+# |  _  |_     _|
+# | | | |/ / \ \ 
+# \_| |_/\/|_|\/
+#
+#	This method is by far
+#	the most efficient.	
+#	I tried to make my own
+#	priority queue class but
+#	It was buggy so I imported
+#	methods from python's
+#	heapq library.
+               
+def aStar():
+	succeeded = 0
+	expanded = 0
+	created = 0
+	maxF = 0
+	pState = PuzState(STATE)
+	VISITED.append(pState.state)
+	pq = [(0, pState)]
+	while len(pq) > 0:
+		pState2 = heappop(pq)[1]
+		expanded += 1
+		if len(pq) > maxF:
+			maxF = len(pq)
+		if (pState2.state == SOLVED_STATE or\
+			pState2.state == SOLVED_STATE_B):
+			succeeded = 1
+			break
+		possibleStates = findMoves(pState2)
+		created += len(possibleStates)
+		for eachState in possibleStates:
+			heappush(pq, (eachState.hval + eachState.depth, eachState));
+	if (succeeded == 0):
+		print -1,-1,-1,-1
+		exit()
+	print (pState2.depth,created,expanded,maxF)
