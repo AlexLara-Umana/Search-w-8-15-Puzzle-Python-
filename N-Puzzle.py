@@ -145,7 +145,7 @@ class Node:
         x, y = self.find(self.state, 0)
         """ Direc contains position values for moving the blank space in either of
             the 4 directions [up,down,left,right] . """
-        direc = {"Left": [x, y - 1], "Right": [x, y + 1], "Up": [x - 1, y], "Down": [x + 1, y]}
+        direc = {"L": [x, y - 1], "R": [x, y + 1], "U": [x - 1, y], "D": [x + 1, y]}
         childs = []
         for i in direc:
             child = self.move(self.state, x, y, direc[i][0], direc[i][1])
