@@ -1,5 +1,5 @@
 """
-- The project focus on solving n-puzzle problem through the use of search methods, which is divided into tow parts:
+- The project focus on solving n-puzzle problem through the use of search methods, which is divided into two parts:
          1- uninformed search methods, that include:
              i- Breadth first
              ii- Depth first
