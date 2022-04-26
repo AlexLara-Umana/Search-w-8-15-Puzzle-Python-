@@ -603,7 +603,8 @@ initial = [[1, 2, 3, 4],
 [9, 10, 11, 0],
 [12, 13, 15, 14]]
 
-print(initial)
+for row in initial:
+     print(row)
 
 """ Choosing an algorithm """
 algorithm = input("Choose an algorithm [Breadth first, Depth first, Uniform cost, Depth limited, Iterative deepening, \
